@@ -76,7 +76,7 @@ Setup and Launch
 3.  Open the index.html file in your favorite web browser.
 
 
-##Developers
+Developers
 
 - Doğukan Yurtturk ([GitHub](https://github.com/dgkann))  
 - Abdullah Acar
