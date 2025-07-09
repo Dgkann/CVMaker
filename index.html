@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Next-Gen CV Maker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            poppins: ['Poppins', 'sans-serif'],
+            roboto: ['Roboto', 'sans-serif'],
+            serif: ['Merriweather', 'serif'],
+            mono: ['Fira Mono', 'monospace'],
+          },
+          colors: {
+            'primary': '#3498db',
+            'accent': '#2ecc71',
+            'dark-bg': '#232946',
+            'light-bg': '#f4f7f6',
+            'glass': 'rgba(255,255,255,0.7)',
+            'glass-dark': 'rgba(44,62,80,0.6)',
+            'neumorph': '#e0e5ec',
+            'neumorph-dark': '#232946',
+            'shadow-light': '#ffffff',
+            'shadow-dark': '#a3b1c6',
+          },
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;500&family=Merriweather:wght@400;700&family=Fira+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="relative">
+  <canvas id="bg-anim"></canvas>
+  <div class="noise-bg"></div>
+
+  <div class="w-full flex flex-col items-center pt-8 pb-12 z-10 relative">
+    <div class="flex items-center justify-between w-full max-w-5xl mb-6 px-4">
+      <h1 class="main-title text-primary dark:text-white select-none tracking-tight transition" style="color: var(--primary);">Next-Gen CV Maker</h1>
+      <div class="flex items-center gap-2">
+        <button id="fontCycleBtn" aria-label="Cycle Preview Font"
+          class="ml-1 px-2 py-2 glass-card flex items-center justify-center shadow-md hover:scale-105 transition-all"
+          title="Change Preview Font">
+          <span class="material-icons text-lg">text_fields</span>
+        </button>
+        <button id="randThemeBtn" aria-label="Random Theme"
+          class="ml-1 px-2 py-2 glass-card flex items-center justify-center shadow-md hover:scale-105 transition-all"
+          title="Random Theme">
+          <span class="material-icons text-lg">auto_awesome</span>
+        </button>
+        <button id="darkToggle" aria-label="Toggle dark mode"
+          class="ml-4 px-3 py-2 glass-card flex items-center justify-center shadow-md hover:scale-105 transition-all"
+          title="Toggle dark/light mode">
+          <span class="material-icons text-xl" id="darkIcon">dark_mode</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mb-4 w-full max-w-5xl px-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="text-sm font-semibold mr-1">Theme:</span>
+        <button class="theme-btn bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded flex items-center gap-1" data-theme="blue">🟦 Blue</button>
+        <button class="theme-btn bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded flex items-center gap-1" data-theme="green">🟩 Teal</button>
+        <button class="theme-btn bg-orange-100 hover:bg-orange-200 text-orange-700 px-2 py-1 rounded flex items-center gap-1" data-theme="orange">🟧 Coral</button>
+        <button class="theme-btn bg-purple-100 hover:bg-purple-200 text-purple-700 px-2 py-1 rounded flex items-center gap-1" data-theme="purple">💜 Indigo</button>
+        <button class="theme-btn bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded flex items-center gap-1" data-theme="minimal">⚪ Minimal</button>
+        <button class="theme-btn bg-gray-800 hover:bg-gray-900 text-white px-2 py-1 rounded flex items-center gap-1" data-theme="dark">🖤 Dark</button>
+      </div>
+    </div>
+
+    <div class="cv-maker-wrapper w-full max-w-5xl flex flex-col md:flex-row gap-8 items-stretch px-4">
+      <div class="form-section flex-1 w-full relative">
+        <div class="glass-card p-8 relative z-10 overflow-hidden" style="min-height:680px;">
+          <div class="step-label" id="stepLabel"></div>
+          <div class="progress-bar-bg mb-7">
+            <div class="progress-bar-fill" id="progressBarFill" style="background: linear-gradient(90deg, var(--primary) 70%, var(--accent) 100%);"></div>
+          </div>
+          <form id="cvForm" autocomplete="off">
+            <div class="step-container" data-step="1">
+              <h2 class="font-poppins font-bold mb-4">Personal Information</h2>
+              <label for="name" class="font-medium">Full Name</label>
+              <input type="text" id="name" name="name" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="e.g., Dogukan Yurtturk"autocomplete="name">
+              <label for="profession" class="font-medium">Profession/Title</label>
+              <input type="text" id="profession" name="profession" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="e.g., Software Engineer" autocomplete="organization-title">
+              <label for="summary" class="font-medium">Profile Summary</label>
+              <textarea id="summary" name="summary" rows="2" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="A brief introduction about yourself" ></textarea>
+              <label for="email" class="font-medium">Email</label>
+              <input type="email" id="email" name="email" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="e.g., dogukan.yurtturk@example.com" autocomplete="email">
+              <label for="phone" class="font-medium">Phone Number</label>
+              <input type="tel" id="phone" name="phone" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="e.g., (123) 456-7890" autocomplete="tel">
+              <label for="profilePic" class="font-medium">Profile Picture</label>
+              <input type="file" id="profilePic" name="profilePic" accept="image/jpeg, image/png, image/gif" class="block w-full text-sm mb-4 rounded shadow border border-gray-200 bg-white py-2 px-3">
+              <div class="button-group flex justify-end gap-4">
+                <button type="button" class="next ripple text-white px-6 py-2 rounded-lg font-poppins font-semibold shadow transition" data-nextstep="2" tabindex="0" style="background-color: var(--primary);">Next</button>
+              </div>
+            </div>
+            <div class="step-container" data-step="2">
+              <h2 class="font-poppins font-bold mb-4">Education, Skills, Experience</h2>
+              <label for="education" class="font-medium">Education</label>
+              <textarea id="education" name="education" rows="2" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="e.g., Bachelor IUS 2025" ></textarea>
+              <label for="skills" class="font-medium flex items-center gap-2">Skills
+                <button type="button" class="suggest-btn" data-field="skills" title="Suggest Skills">
+                  <span class="material-icons text-sm" style="color: var(--primary);">auto_fix_high</span>
+                </button>
+              </label>
+              <textarea id="skills" name="skills" rows="2" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="e.g., JavaScript, React, Node.js, ..." ></textarea>
+              <label for="experience" class="font-medium">Experience</label>
+              <textarea id="experience" name="experience" rows="4" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="Job experience, achievements..." ></textarea>
+              <label for="languages" class="font-medium flex items-center gap-2">Languages
+                <button type="button" class="suggest-btn" data-field="languages" title="Suggest Languages">
+                  <span class="material-icons text-sm" style="color: var(--accent);">auto_fix_high</span>
+                </button>
+              </label>
+              <textarea id="languages" name="languages" rows="2" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="e.g., English (Native), Spanish (Fluent)"></textarea>
+              <label for="certifications" class="font-medium">Certifications</label>
+              <textarea id="certifications" name="certifications" rows="2" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="e.g., AWS Certified Solutions Architect" ></textarea>
+              <label for="interests" class="font-medium flex items-center gap-2">Interests
+                <button type="button" class="suggest-btn" data-field="interests" title="Suggest Interests">
+                  <span class="material-icons text-sm text-purple-600">auto_fix_high</span> 
+                </button>
+              </label>
+              <textarea id="interests" name="interests" rows="2" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="e.g., Open source, Hiking, Photography" ></textarea>
+              <div class="button-group flex justify-between gap-4">
+                <button type="button" class="back ripple bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-poppins font-semibold hover:bg-gray-400 focus:ring-2 focus:ring-gray-200 shadow transition" data-prevstep="1" tabindex="0">Back</button>
+                <button type="button" class="next ripple text-white px-6 py-2 rounded-lg font-poppins font-semibold shadow transition" data-nextstep="3" tabindex="0" style="background-color: var(--primary);">Next</button>
+              </div>
+            </div>
+            <div class="step-container" data-step="3">
+              <h2 class="font-poppins font-bold mb-4">Finalize & Download</h2>
+              <label for="github" class="font-medium">GitHub Profile URL</label>
+              <input type="url" id="github" name="github" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="https://github.com/username">
+              <label for="linkedin" class="font-medium">LinkedIn Profile URL</label>
+              <input type="url" id="linkedin" name="linkedin" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="https://linkedin.com/in/username">
+              <label for="website" class="font-medium">Portfolio/Website</label>
+              <input type="url" id="website" name="website" class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary transition" placeholder="https://yourportfolio.com">
+              <div class="mt-2 mb-5">
+                <span class="block font-medium mb-2">Choose CV Template:</span>
+                <div class="flex gap-5">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="cvTemplate" value="classic" checked class="accent-primary" style="accent-color: var(--primary);">
+                    <span>Classic</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="cvTemplate" value="modern" class="accent-primary" style="accent-color: var(--primary);">
+                    <span>Modern</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="cvTemplate" value="creative" class="accent-primary" style="accent-color: var(--primary);">
+                    <span>Creative</span>
+                  </label>
+                </div>
+              </div>
+              <p class="text-gray-500 mb-6 text-sm">Review your information in the live preview. When ready, download your CV as PDF or image.</p>
+              <div class="button-group flex flex-wrap gap-3">
+                <button type="button" class="back ripple bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-poppins font-semibold hover:bg-gray-400 focus:ring-2 focus:ring-gray-200 shadow transition" data-prevstep="2" tabindex="0">Back</button>
+                <button type="submit" class="primary ripple text-white px-6 py-2 rounded-lg font-poppins font-semibold shadow transition" style="background-color: var(--accent);">Download PDF</button>
+                <button id="downloadImg" type="button" class="ripple text-white px-6 py-2 rounded-lg font-poppins font-semibold shadow transition" style="background-color: var(--primary);">Download Image</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <aside class="preview-section flex-1 w-full relative z-10" data-font="sans">
+        <div class="glass-card sticky top-8 p-7" id="cvPreviewCard" style="user-select:text; cursor:default;">
+          <div class="drag-handle" id="dragHandle" tabindex="0" title="Drag to move (desktop)">⠿</div>
+          <h2 class="font-poppins text-center font-bold mb-2 text-primary dark:text-blue-100 transition" style="color: var(--primary);">Live CV Preview</h2>
+          <div class="flex flex-col items-center mb-3">
+            <img id="previewPic" class="profile-pic-preview mb-1 hidden" src="#" alt="Profile Picture" style="border-color: var(--primary);">
+            <span id="previewPicPlaceholder" class="text-xs text-gray-400 select-none">Your Photo</span>
+          </div>
+          <h3 class="font-bold text-lg text-center mb-1" id="previewName">Dogukan Yurtturk</h3>
+          <div class="text-center font-medium mb-3" id="previewProfession" style="color: var(--primary);">Full Stack Web Developer</div>
+          <div class="text-center text-sm text-gray-500 mb-2" id="previewSummary">Creative and detail-oriented developer with a passion for building interactive and accessible web experiences.</div>
+          <div class="mb-2 text-center">
+            <span class="inline-block text-gray-700 mr-2"><span class="material-icons" style="font-size:1.1em">email</span> <span id="previewEmail">dogukan.yurtturk@example.com</span></span>
+            <span class="inline-block text-gray-700"><span class="material-icons" style="font-size:1.1em">call</span> <span id="previewPhone">(555) 123-9876</span></span>
+          </div>
+          <div class="border-b border-gray-200 dark:border-gray-700 my-2"></div>
+          <div class="mb-2">
+            <h4 class="font-semibold text-primary dark:text-blue-200 mb-1" style="color: var(--primary);">Education</h4>
+            <div id="previewEducation" class="text-sm text-gray-800 dark:text-gray-200">Masters in Computer Science, MIT (2022)<br>BSc in Software Engineering, Stanford (2018)</div>
+          </div>
+          <div class="mb-2">
+            <h4 class="font-semibold text-primary dark:text-blue-200 mb-1" style="color: var(--primary);">Experience</h4>
+            <div id="previewExperience" class="text-sm text-gray-800 dark:text-gray-200">Senior Web Developer - NextGen Studios (2022-Present)<br>- Led the frontend architecture for high-traffic SaaS products.<br>- Mentored a team of 5+ engineers and designers.<br>Frontend Developer - Creative Apps (2019-2022)<br>- Built modern, accessible UI for 30+ client projects.</div>
+          </div>
+          <div class="mb-2">
+            <h4 class="font-semibold text-primary dark:text-blue-200 mb-1" style="color: var(--primary);">Skills</h4>
+            <div id="previewSkills" class="flex flex-wrap gap-2 text-xs text-gray-900 dark:text-gray-100"></div>
+          </div>
+          <div class="mb-2">
+            <h4 class="font-semibold text-primary dark:text-blue-200 mb-1" style="color: var(--primary);">Languages</h4>
+            <div id="previewLanguages" class="flex flex-wrap gap-2 text-xs text-gray-900 dark:text-gray-100"></div>
+          </div>
+          <div class="mb-2">
+            <h4 class="font-semibold text-primary dark:text-blue-200 mb-1" style="color: var(--primary);">Certifications</h4>
+            <div id="previewCertifications" class="flex flex-wrap gap-2 text-xs text-gray-900 dark:text-gray-100"></div>
+          </div>
+          <div class="mb-2">
+            <h4 class="font-semibold text-primary dark:text-blue-200 mb-1" style="color: var(--primary);">Interests</h4>
+            <div id="previewInterests" class="flex flex-wrap gap-2 text-xs text-gray-900 dark:text-gray-100"></div>
+          </div>
+          <div class="border-b border-gray-200 dark:border-gray-700 my-2"></div>
+          <div class="flex flex-wrap items-center gap-2 justify-center mt-2">
+            <a href="#" id="previewGithub" target="_blank" class="hover:underline flex items-center gap-1 text-sm" style="color: var(--primary);">
+              <span class="material-icons text-base">code</span> GitHub
+            </a>
+            <a href="#" id="previewLinkedin" target="_blank" class="hover:underline flex items-center gap-1 text-sm" style="color: var(--primary);">
+              <span class="material-icons text-base">business_center</span> LinkedIn
+            </a>
+            <a href="#" id="previewWebsite" target="_blank" class="hover:underline flex items-center gap-1 text-sm" style="color: var(--primary);">
+              <span class="material-icons text-base">public</span> Portfolio
+            </a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="toast-tip" id="toastTip" role="status" aria-live="polite" tabindex="-1"></div>
+
+  <button id="scrollTopBtn" class="glass-card ripple shadow-lg flex items-center justify-center p-2" aria-label="Scroll to Top" title="Back to Top">
+    <span class="material-icons">arrow_upward</span>
+  </button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-analytics.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+  apiKey: "AIzaSyDvCLSu2QgNbUEp5MfqLq-hBbYJ03ioMuU",
+  authDomain: "cvbuilderv2.firebaseapp.com",
+  projectId: "cvbuilderv2",
+  storageBucket: "cvbuilderv2.firebasestorage.app",
+  messagingSenderId: "578171597581",
+  appId: "1:578171597581:web:c9ae8ea94ffaa6ce1af644",
+  measurementId: "G-LFDVP94BTK"
+};
+
+    try {
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const SHARED_CV_DOCUMENT_ID = "globalSharedCV"; 
+
+        function showToastForFirebase(msg) {
+          const toastEl = document.getElementById('toastTip');
+          if (toastEl) {
+            toastEl.innerHTML = msg;
+            toastEl.classList.add('show');
+            toastEl.focus(); 
+            setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, 3200);
+          } else {
+            console.log("Toast (Firebase):", msg); 
+          }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+          const exportBtnsContainer = document.querySelector('.step-container[data-step="3"] .button-group');
+          if (exportBtnsContainer) {
+            let saveBtn = document.createElement('button');
+            saveBtn.type = "button";
+            saveBtn.id = "saveToCloud";
+            saveBtn.className = "ripple text-white px-6 py-2 rounded-lg font-poppins font-semibold shadow transition";
+            saveBtn.style.backgroundColor = 'var(--primary)'; 
+            saveBtn.innerHTML = `<span class="material-icons" style="font-size:1em;vertical-align:-2px;margin-right:4px;">cloud_upload</span>Save to Cloud`;
+            
+            
+            const submitButton = exportBtnsContainer.querySelector('button[type="submit"]');
+            if (submitButton) { 
+                exportBtnsContainer.insertBefore(saveBtn, submitButton);
+                exportBtnsContainer.insertBefore(loadBtn, saveBtn.nextSibling); 
+            } else { 
+                exportBtnsContainer.appendChild(saveBtn);
+                exportBtnsContainer.appendChild(loadBtn);
+            }
+
+            saveBtn.addEventListener('click', async () => {
+              const form = document.getElementById('cvForm');
+              const data = {};
+              Array.from(form.elements).forEach(el => {
+                if (el.name && !['profilePic'].includes(el.name)) {
+                  if (el.type === "radio") {
+                    if (el.checked) data[el.name] = el.value;
+                  } else {
+                    data[el.name] = el.value;
+                  }
+                }
+              });
+              const img = document.getElementById('previewPic');
+              data.profilePicData = (img && !img.classList.contains('hidden') && img.src && img.src.startsWith("data:image")) ? img.src : "";
+              
+              try {
+                await addDoc(collection(db,"cvs"),data); 
+                showToastForFirebase("✅ CV saved to cloud (shared)!");
+              } catch (err) {
+                console.error("Firebase save error:", err);
+                showToastForFirebase("❌ Error saving CV. Check console.");
+              }
+            });
+
+            loadBtn.addEventListener('click', async () => {
+              try {
+                const snap = await getDoc(doc(db, "cvs", SHARED_CV_DOCUMENT_ID)); 
+                if (!snap.exists()) {
+                  showToastForFirebase("⚠️ No shared CV found in the cloud.");
+                  return;
+                }
+                const data = snap.data();
+                const form = document.getElementById('cvForm');
+                for (let k in data) {
+                  if (k === "profilePicData") continue;
+                  let el = form.elements[k];
+                  if (!el) continue;
+                  
+                  if (el.type === "radio" || (el.length && el[0] && el[0].type === "radio")) {
+                    let radios = form.querySelectorAll(`[name="${k}"]`);
+                    radios.forEach(radio => {
+                      radio.checked = (radio.value === data[k]);
+                    });
+                  } else {
+                    el.value = data[k];
+                  }
+                  el.dispatchEvent(new Event('input', { bubbles: true })); 
+                }
+                
+                if (data.profilePicData) {
+                  const img = document.getElementById('previewPic');
+                  const placeholder = document.getElementById('previewPicPlaceholder');
+                  if (img && placeholder) {
+                    img.src = data.profilePicData;
+                    img.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                  }
+                }
+                showToastForFirebase("✅ Shared CV loaded from cloud!");
+                if (window.updatePreview) window.updatePreview();
+              } catch (err) {
+                console.error("Firebase load error:", err);
+                showToastForFirebase("❌ Error loading CV. Check console.");
+              }
+            });
+          } else {
+            console.error("Could not find button container for Firebase Save/Load.");
+          }
+        });
+    } catch (error) {
+        console.error("Firebase initialization failed:", error);
+        const toastEl = document.getElementById('toastTip');
+        if (toastEl) {
+            toastEl.innerHTML = "❌ Cloud features disabled: Firebase init failed. Check console.";
+            toastEl.classList.add('show');
+            toastEl.style.backgroundColor = "red"; 
+            toastEl.style.color = "white";
+        }
+    }
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>
